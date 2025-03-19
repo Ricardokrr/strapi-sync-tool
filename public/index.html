@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strapi Sync Ricasula</title>
+    <style>
+        :root {
+            --primary: #4945ff;
+            --primary-hover: #7b78ff;
+            --success: #5cb176;
+            --danger: #d02b20;
+            --neutral-150: #eaeaef;
+            --neutral-200: #dcdce4;
+            --neutral-500: #8e8ea9;
+            --neutral-600: #666687;
+            --neutral-700: #4a4a6a;
+            --neutral-800: #32324d;
+            --radius: 4px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+        
+        body {
+            background-color: #f6f6f9;
+            color: var(--neutral-800);
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 4px rgba(33, 33, 52, 0.1);
+            margin-bottom: 24px;
+            padding: 24px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--neutral-800);
+            margin-bottom: 8px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--neutral-800);
+            margin-bottom: 16px;
+        }
+        
+        p {
+            color: var(--neutral-600);
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--neutral-800);
+            margin-bottom: 4px;
+        }
+        
+        input[type="text"],
+        input[type="url"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px 16px;
+            font-size: 14px;
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius);
+            color: var(--neutral-800);
+            transition: all 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(73, 69, 255, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border-color: var(--neutral-200);
+            color: var(--neutral-700);
+        }
+        
+        .btn-outline:hover {
+            background: var(--neutral-150);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-icon {
+            margin-right: 8px;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .flex-col {
+            flex-direction: column;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .gap-2 {
+            gap: 8px;
+        }
+        
+        .gap-4 {
+            gap: 16px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .mt-4 {
+            margin-top: 16px;
+        }
+        
+        .w-full {
+            width: 100%;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        
+        .alert-info {
+            background-color: rgba(73, 69, 255, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .alert-success {
+            background-color: rgba(92, 177, 118, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-danger {
+            background-color: rgba(208, 43, 32, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+        
+        .badge-dev {
+            background-color: rgba(73, 69, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-prod {
+            background-color: rgba(208, 43, 32, 0.1);
+            color: var(--danger);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--neutral-700);
+            font-size: 14px;
+        }
+        
+        td {
+            font-size: 14px;
+            color: var(--neutral-600);
+        }
+        
+        tr:hover td {
+            background-color: var(--neutral-150);
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        .status-dot-success {
+            background-color: var(--success);
+        }
+        
+        .status-dot-pending {
+            background-color: #f5a623;
+        }
+        
+        .status-dot-error {
+            background-color: var(--danger);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: var(--neutral-200);
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: var(--radius);
+            background-color: var(--primary);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        
+        #content-preview {
+            display: none;
+        }
+        
+        .preview-item {
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .preview-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .preview-item-title {
+            font-weight: 600;
+        }
+        
+        .preview-item-details {
+            font-size: 14px;
+            color: var(--neutral-600);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(73, 69, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.57 9.16c0-.57.32-.87.82-.87h3.56c.5 0 .82.3.82.87v1.51c0 .52-.33.81-.82.81h-3.56c-.5 0-.82-.28-.82-.8V9.16Zm1.23.21v1.09h2.74V9.37h-2.74ZM9.57 13.51c0-.56.32-.87.82-.87h3.56c.5 0 .82.31.82.87v1.52c0 .54-.33.85-.82.85h-3.56c-.5 0-.82-.31-.82-.85v-1.52Zm1.23.23v1.07h2.74v-1.07h-2.74Z" fill="currentColor"/>
+                    <path d="M18.9 17.09V6.91c0-1.78-1.04-2.86-2.74-2.86H7.84c-1.7 0-2.74 1.08-2.74 2.86v10.18c0 1.78 1.04 2.86 2.74 2.86h8.32c1.7 0 2.74-1.08 2.74-2.86Zm-1.7 0c0 .77-.35 1.15-1.04 1.15H7.84c-.69 0-1.04-.38-1.04-1.15V6.91c0-.77.35-1.15 1.04-1.15h8.32c.69 0 1.04.38 1.04 1.15v10.18Z" fill="currentColor"/>
+                </svg>
+                Strapi Sync Ricasula
+            </div>
+        </header>
+        
+        <div class="card">
+            <h1>Sincroniza contenido entre entornos Strapi</h1>
+            <p>Esta herramienta te permite transferir contenido entre tus entornos de desarrollo y producción de Strapi de manera rápida y eficiente.</p>
+            
+            <div class="alert alert-info">
+                Para comenzar, configura tus credenciales de acceso para ambos entornos. Todas las credenciales se manejan localmente y no se envían a ningún servidor externo.
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>Entorno de Desarrollo <span class="badge badge-dev">DEV</span></h2>
+                
+                <div class="form-group">
+                    <label for="dev-url">URL del entorno de desarrollo</label>
+                    <input type="url" id="dev-url" value="https://strapi.dev.k8s.sandals.com" placeholder="https://strapi.dev.example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dev-email">Email</label>
+                    <input type="text" id="dev-email" placeholder="tu@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dev-password">Contraseña</label>
+                    <input type="password" id="dev-password" placeholder="••••••••">
+                </div>
+                
+                <button id="dev-connect" class="btn btn-primary">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 9V5L21 12L14 19V15C7 15 4 18 3 22C4 17 7 9 14 9Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Conectar
+                </button>
+                
+                <div id="dev-status" class="mt-4" style="display: none;">
+                    <div class="flex items-center">
+                        <span class="status-dot status-dot-success"></span>
+                        <span>Conectado como <strong id="dev-username">usuario</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Entorno de Producción <span class="badge badge-prod">PROD</span></h2>
+                
+                <div class="form-group">
+                    <label for="prod-url">URL del entorno de producción</label>
+                    <input type="url" id="prod-url" value="https://strapi.sandals.com" placeholder="https://strapi.example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="prod-email">Email</label>
+                    <input type="text" id="prod-email" placeholder="tu@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="prod-password">Contraseña</label>
+                    <input type="password" id="prod-password" placeholder="••••••••">
+                </div>
+                
+                <button id="prod-connect" class="btn btn-primary">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 9V5L21 12L14 19V15C7 15 4 18 3 22C4 17 7 9 14 9Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Conectar
+                </button>
+                
+                <div id="prod-status" class="mt-4" style="display: none;">
+                    <div class="flex items-center">
+                        <span class="status-dot status-dot-success"></span>
+                        <span>Conectado como <strong id="prod-username">usuario</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="content-selector" class="card" style="display: none;">
+            <h2>Seleccionar contenido para sincronizar</h2>
+            
+            <div class="form-group">
+                <label for="content-url">URL de la página o contenido a sincronizar</label>
+                <div class="flex gap-2">
+                    <input type="url" id="content-url" placeholder="https://strapi.dev.k8s.sandals.com/admin/content-manager/collectionType/api::page.page/1340" class="w-full">
+                    <button id="fetch-content" class="btn btn-primary">Obtener</button>
+                </div>
+                <p class="mt-4" style="font-size: 13px; color: var(--neutral-500);">
+                    Pega la URL completa de la página o contenido que deseas sincronizar desde el entorno de desarrollo.
+                </p>
+            </div>
+            
+            <div id="content-info" style="display: none;">
+                <div class="alert alert-success">
+                    <div class="flex items-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="currentColor"/>
+                        </svg>
+                        <span>Contenido encontrado: <strong id="content-title">Título del contenido</strong></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tipo de contenido: <span id="content-type">Tipo</span></label>
+                </div>
+                
+                <div class="form-group">
+                    <label>ID del contenido: <span id="content-id">ID</span></label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Última actualización: <span id="content-updated">Fecha</span></label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="content-preview" class="card">
+            <h2>Vista previa del contenido a sincronizar</h2>
+            
+            <div id="preview-items">
+                <!-- Los elementos de vista previa se generarán dinámicamente aquí -->
+            </div>
+            
+            <div class="alert alert-info">
+                <div class="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z" fill="currentColor"/>
+                    </svg>
+                    <span>Selecciona los elementos que deseas sincronizar del entorno de desarrollo al de producción.</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between mt-4">
+                <button id="select-all" class="btn btn-outline">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 10L9 15L20 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Seleccionar todo
+                </button>
+                
+                <button id="start-sync" class="btn btn-primary">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.75 13.97 17.3 14.8L18.76 16.26C19.54 15.03 20 13.57 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.46 8.97 4 10.43 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Iniciar sincronización
+                </button>
+            </div>
+        </div>
+        
+        <div id="sync-status" class="card" style="display: none;">
+            <h2>Progreso de sincronización</h2>
+            
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            
+            <div id="sync-stats" class="flex justify-between">
+                <div>
+                    <strong>Total:</strong> <span id="sync-total">0</span> elementos
+                </div>
+                <div>
+                    <strong>Completados:</strong> <span id="sync-completed">0</span>
+                </div>
+                <div>
+                    <strong>Errores:</strong> <span id="sync-errors">0</span>
+                </div>
+            </div>
+            
+            <table class="mt-4">
+                <thead>
+                    <tr>
+                        <th>Elemento</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="sync-items">
+                    <!-- Las filas de sincronización se generarán dinámicamente aquí -->
+                </tbody>
+            </table>
+            
+            <div class="flex justify-between mt-4">
+                <button id="sync-cancel" class="btn btn-outline">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Cancelar
+                </button>
+                
+                <button id="sync-done" class="btn btn-success" style="display: none;">
+                    <span class="btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 16.2L4.8 12L3.4 13.4L9 19L21 7L19.6 5.6L9 16.2Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loading-message">Cargando...</p>
+    </div>
+    
+    <script>
+        // Variables globales
+        let devSessionId = null;
+        let prodSessionId = null;
+        let contentData = null;
+        let selectedItems = [];
+        
+        const API_BASE = ''; // Vacío para el mismo dominio
+        
+        const devConnectBtn = document.getElementById('dev-connect');
+        const prodConnectBtn = document.getElementById('prod-connect');
+        const fetchContentBtn = document.getElementById('fetch-content');
+        const selectAllBtn = document.getElementById('select-all');
+        const startSyncBtn = document.getElementById('start-sync');
+        const syncCancelBtn = document.getElementById('sync-cancel');
+        const syncDoneBtn = document.getElementById('sync-done');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        
+        function toggleLoading(show, message = 'Cargando...') {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
+            loadingMessage.textContent = message;
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        devConnectBtn.addEventListener('click', async () => {
+            const url = document.getElementById('dev-url').value.trim();
+            const email = document.getElementById('dev-email').value.trim();
+            const password = document.getElementById('dev-password').value;
+            
+            if (!url || !email || !password) {
+                showAlert('Por favor, completa todos los campos para el entorno de desarrollo.', 'danger');
+                return;
+            }
+            
+            toggleLoading(true, 'Conectando con el entorno de desarrollo...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url,
+                        email,
+                        password,
+                        environment: 'development'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al conectar');
+                }
+                
+                // Guardar el ID de sesión
+                devSessionId = data.sessionId;
+                document.getElementById('dev-status').style.display = 'block';
+                document.getElementById('dev-username').textContent = data.user.email;
+                devConnectBtn.disabled = true;
+                
+                // Si ambos entornos están conectados, mostrar el selector de contenido
+                if (devSessionId && prodSessionId) {
+                    document.getElementById('content-selector').style.display = 'block';
+                }
+                
+                showAlert('Conectado exitosamente al entorno de desarrollo.', 'success');
+            } catch (error) {
+                showAlert(`Error al conectar con el entorno de desarrollo: ${error.message}`, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+
+prodConnectBtn.addEventListener('click', async () => {
+    const url = document.getElementById('prod-url').value.trim();
+    const email = document.getElementById('prod-email').value.trim();
+    const password = document.getElementById('prod-password').value;
+    
+    if (!url || !email || !password) {
+        showAlert('Por favor, completa todos los campos para el entorno de producción.', 'danger');
+        return;
+    }
+    
+    toggleLoading(true, 'Conectando con el entorno de producción...');
+    
+    try {
+        console.log('Intentando conectar a producción con URL:', url);
+        
+        const response = await fetch(`${API_BASE}/api/auth`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: url,
+                email: email,
+                password: password,
+                environment: 'production'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('Error en respuesta:', data);
+            throw new Error(data.error || 'Error al conectar');
+        }
+        
+        prodSessionId = data.sessionId;
+        document.getElementById('prod-status').style.display = 'block';
+        document.getElementById('prod-username').textContent = data.user.email;
+        prodConnectBtn.disabled = true;
+        
+        if (devSessionId && prodSessionId) {
+            document.getElementById('content-selector').style.display = 'block';
+        }
+        
+        showAlert('Conectado exitosamente al entorno de producción.', 'success');
+    } catch (error) {
+        console.error('Error de conexión:', error);
+        showAlert(`Error al conectar con el entorno de producción: ${error.message}`, 'danger');
+    } finally {
+        toggleLoading(false);
+    }
+});
+        
+        fetchContentBtn.addEventListener('click', async () => {
+            const contentUrl = document.getElementById('content-url').value.trim();
+            
+            if (!contentUrl) {
+                showAlert('Por favor, ingresa la URL del contenido que deseas sincronizar.', 'danger');
+                return;
+            }
+            
+            toggleLoading(true, 'Obteniendo información del contenido...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/fetch-content`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId: devSessionId,
+                        contentUrl
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al obtener contenido');
+                }
+                
+                contentData = data;
+                
+                document.getElementById('content-info').style.display = 'block';
+                document.getElementById('content-title').textContent = contentData.title;
+                document.getElementById('content-type').textContent = contentData.type;
+                document.getElementById('content-id').textContent = contentData.id;
+                document.getElementById('content-updated').textContent = new Date(contentData.updatedAt).toLocaleString();
+                
+                document.getElementById('content-preview').style.display = 'block';
+                
+                generatePreviewItems(contentData);
+                
+                showAlert('Contenido encontrado y listo para sincronizar.', 'success');
+            } catch (error) {
+                showAlert(`Error al obtener el contenido: ${error.message}`, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+        function generatePreviewItems(data) {
+            const previewContainer = document.getElementById('preview-items');
+            previewContainer.innerHTML = '';
+            
+            const pageItem = document.createElement('div');
+            pageItem.className = 'preview-item';
+            pageItem.innerHTML = `
+                <div class="preview-item-header">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="page_main" checked data-id="${data.id}" data-type="page" data-contentType="${data.type}">
+                        <label for="page_main" class="preview-item-title">Página completa</label>
+                    </div>
+                    <span class="badge badge-dev">Página</span>
+                </div>
+                <div class="preview-item-details">
+                    <div>ID: ${data.id}</div>
+                    <div>Localizaciones: ${data.localizations.join(', ') || 'N/A'}</div>
+                </div>
+            `;
+            previewContainer.appendChild(pageItem);
+            
+            if (data.components && data.components.length > 0) {
+                data.components.forEach(comp => {
+                    const compItem = document.createElement('div');
+                    compItem.className = 'preview-item';
+                    compItem.innerHTML = `
+                        <div class="preview-item-header">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="${comp.id}" checked data-id="${comp.id}" data-type="${comp.type}" data-contentType="${data.type}">
+                                <label for="${comp.id}" class="preview-item-title">${comp.name}</label>
+                            </div>
+                            <span class="badge badge-dev">Componente</span>
+                        </div>
+                        <div class="preview-item-details">
+                            <div>Tipo: ${comp.type}</div>
+                            <div>Campos: ${comp.fields.join(', ')}</div>
+                        </div>
+                    `;
+                    previewContainer.appendChild(compItem);
+                });
+            } else {
+                const noComps = document.createElement('div');
+                noComps.className = 'alert alert-info';
+                noComps.textContent = 'No se encontraron componentes específicos para este contenido.';
+                previewContainer.appendChild(noComps);
+            }
+            
+            updateSelectedItems();
+        }
+        
+        function updateSelectedItems() {
+            selectedItems = [];
+            const checkboxes = document.querySelectorAll('#preview-items input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                selectedItems.push({
+                    id: checkbox.dataset.id,
+                    type: checkbox.dataset.type,
+                    name: checkbox.nextElementSibling.textContent,
+                    contentType: checkbox.dataset.contenttype
+                });
+            });
+        }
+        
+        selectAllBtn.addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('#preview-items input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+            
+            updateSelectedItems();
+            selectAllBtn.textContent = allChecked ? 'Seleccionar todo' : 'Deseleccionar todo';
+        });
+        
+        document.addEventListener('change', event => {
+            if (event.target.matches('#preview-items input[type="checkbox"]')) {
+                updateSelectedItems();
+            }
+        });
+        
+        startSyncBtn.addEventListener('click', async () => {
+            if (selectedItems.length === 0) {
+                showAlert('Por favor, selecciona al menos un elemento para sincronizar.', 'danger');
+                return;
+            }
+            
+            document.getElementById('sync-status').style.display = 'block';
+            
+            document.getElementById('sync-total').textContent = selectedItems.length;
+            document.getElementById('sync-completed').textContent = '0';
+            document.getElementById('sync-errors').textContent = '0';
+            
+            const syncItemsContainer = document.getElementById('sync-items');
+            syncItemsContainer.innerHTML = '';
+            
+            selectedItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.id = `sync_row_${item.id}`;
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.type}</td>
+                    <td>
+                        <div class="flex items-center">
+                            <span class="status-dot status-dot-pending"></span>
+                            <span id="sync_status_${item.id}">Pendiente</span>
+                        </div>
+                    </td>
+                `;
+                syncItemsContainer.appendChild(row);
+            });
+            
+            toggleLoading(true, 'Iniciando sincronización...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sync`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sourceSessionId: devSessionId,
+                        destSessionId: prodSessionId,
+                        contentId: contentData.id,
+                        items: selectedItems
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error en la sincronización');
+                }
+                
+                document.getElementById('sync-completed').textContent = result.completed;
+                document.getElementById('sync-errors').textContent = result.errors;
+                document.getElementById('progress-bar').style.width = '100%';
+                
+                result.items.forEach(item => {
+                    const statusElement = document.getElementById(`sync_status_${item.id}`);
+                    const statusDot = statusElement.previousElementSibling;
+                    
+                    if (item.status === 'success') {
+                        statusElement.textContent = 'Completado';
+                        statusDot.className = 'status-dot status-dot-success';
+                    } else {
+                        statusElement.textContent = `Error: ${item.error}`;
+                        statusDot.className = 'status-dot status-dot-error';
+                    }
+                });
+                
+                syncDoneBtn.style.display = 'block';
+                
+                showAlert(`Sincronización completada. ${result.completed} elementos sincronizados, ${result.errors} errores.`, result.errors === 0 ? 'success' : 'info');
+            } catch (error) {
+                showAlert(`Error en el proceso de sincronización: ${error.message}`, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+        syncCancelBtn.addEventListener('click', () => {
+            document.getElementById('sync-status').style.display = 'none';
+        });
+        
+        syncDoneBtn.addEventListener('click', () => {
+            document.getElementById('sync-status').style.display = 'none';
+            document.getElementById('content-url').value = '';
+            document.getElementById('content-info').style.display = 'none';
+            document.getElementById('content-preview').style.display = 'none';
+        });
+        
+        document.getElementById('content-url').addEventListener('focus', async () => {
+            try {
+                const clipboardText = await navigator.clipboard.readText();
+                
+                if (clipboardText.includes('strapi.dev.k8s.sandals.com') && 
+                    clipboardText.includes('/admin/content-manager/')) {
+                    
+                    document.getElementById('content-url').value = clipboardText;
+                    showAlert('URL detectada desde el portapapeles.', 'info');
+                }
+            } catch (error) {
+                console.log('No se pudo acceder al portapapeles:', error);
+            }
+        });
+        
+        document.getElementById('dev-status').addEventListener('click', () => {
+            if (confirm('¿Deseas desconectar del entorno de desarrollo?')) {
+                devSessionId = null;
+                document.getElementById('dev-status').style.display = 'none';
+                devConnectBtn.disabled = false;
+                document.getElementById('content-selector').style.display = 'none';
+                document.getElementById('content-preview').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('prod-status').addEventListener('click', () => {
+            if (confirm('¿Deseas desconectar del entorno de producción?')) {
+                prodSessionId = null;
+                document.getElementById('prod-status').style.display = 'none';
+                prodConnectBtn.disabled = false;
+                document.getElementById('content-selector').style.display = 'none';
+                document.getElementById('content-preview').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
