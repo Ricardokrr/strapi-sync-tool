@@ -15,11 +15,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const sessions = {};
 
+// Página inicial
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-
+/**
+ * /api/auth
+ * Autentica como admin en un Strapi (dev o prod)
+ */
 app.post('/api/auth', async (req, res) => {
   const { url, email, password, environment } = req.body;
   if (!url || !email || !password) {
@@ -102,7 +106,10 @@ app.post('/api/auth', async (req, res) => {
   }
 });
 
-
+/**
+ * /api/fetch-content
+ * Dado un contentUrl (la URL que se ve en Strapi Admin), obtiene la info de un registro (colección)
+ */
 app.post('/api/fetch-content', async (req, res) => {
   const { sessionId, contentUrl } = req.body;
   if (!sessionId || !contentUrl) {
@@ -114,6 +121,7 @@ app.post('/api/fetch-content', async (req, res) => {
   }
 
   try {
+    // Ejemplo de contentUrl:
     // https://strapi.dev/admin/content-manager/collectionType/api::page.page/1340?plugins[i18n][locale]=en
     const matches = contentUrl.match(/collectionType\/([^/]+)\/(\d+)(\?|$)/);
     if (!matches) {
@@ -154,10 +162,12 @@ app.post('/api/fetch-content', async (req, res) => {
       processedContent.localizations = contentData.localizations.locales;
     }
 
+    // Detectar componentes
     for (var key in contentData) {
       if (!contentData.hasOwnProperty(key)) continue;
       const val = contentData[key];
       if (val && typeof val === 'object' && val.__component) {
+        // Componente simple
         processedContent.components.push({
           id: `comp_${key}`,
           type: val.__component,
@@ -166,6 +176,7 @@ app.post('/api/fetch-content', async (req, res) => {
           data: val
         });
       } else if (Array.isArray(val) && val.length > 0 && val[0].__component) {
+        // Componente repetible
         val.forEach((comp, i) => {
           processedContent.components.push({
             id: `comp_${key}_${i}`,
@@ -196,6 +207,10 @@ app.post('/api/fetch-content', async (req, res) => {
   }
 });
 
+/**
+ * /api/sync
+ * Sincroniza ítems (páginas o componentes) desde la fuente (sourceSessionId) al destino (destSessionId)
+ */
 app.post('/api/sync', async (req, res) => {
   const { sourceSessionId, destSessionId, contentId, items } = req.body;
 
@@ -219,8 +234,10 @@ app.post('/api/sync', async (req, res) => {
   for (const item of items) {
     try {
       if (item.type.includes('page')) {
+        // Sincronizar la página entera
         await syncFullPageAdmin(sourceSession, destSession, contentId, item);
       } else {
+        // Sincronizar sólo el componente
         await syncComponentAdmin(sourceSession, destSession, contentId, item);
       }
       results.completed++;
@@ -246,7 +263,9 @@ app.post('/api/sync', async (req, res) => {
   return res.json(results);
 });
 
-
+/**
+ * Elimina campos del sistema, etc.
+ */
 function deepCleanData(obj) {
   if (!obj || typeof obj !== 'object') return obj;
 
@@ -260,6 +279,7 @@ function deepCleanData(obj) {
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) continue;
 
+    // Ignorar campos de sistema (menos si es imagen)
     if (systemFields.includes(key) && !(obj.mime && obj.mime.startsWith('image/'))) {
       continue;
     }
@@ -275,17 +295,24 @@ function deepCleanData(obj) {
   return cleanedObj;
 }
 
+/**
+ * Remueve explícitamente del payload los campos que contienen imágenes,
+ * para que no se actualicen ni modifiquen.
+ */
 function removeImageFields(data) {
   if (!data || typeof data !== 'object') return data;
   
+  // Si hay metadata, eliminar ogImage
   if (data.metadata && data.metadata.ogImage) {
     delete data.metadata.ogImage;
   }
   
+  // Eliminar el arreglo "hero" si existe
   if (data.hero) {
     delete data.hero;
   }
   
+  // En cada elemento del arreglo "content", eliminar la propiedad "media"
   if (data.content && Array.isArray(data.content)) {
     data.content = data.content.map(item => {
       if (item.media) {
@@ -298,7 +325,11 @@ function removeImageFields(data) {
   return data;
 }
 
-
+/**
+ * Copia relaciones desde dev a prod (site, sliders, features, resorts, etc.),
+ * basándose en la data que viene de dev (devRelation).
+ * Retorna algo como { data: [{id:123}, {id:456}] } para asignarlo luego en la página.
+ */
 async function copyRelationsFor(devRelation, collectionUID, destSession) {
   if (!devRelation || !devRelation.data || !devRelation.data.length) {
     return null;
@@ -328,6 +359,9 @@ async function copyRelationsFor(devRelation, collectionUID, destSession) {
   return { data: newRelationArray };
 }
 
+/**
+ * Busca (o crea) un registro en `collectionUID` de Prod, que coincida con el `code` o, si no existe, con el `name`.
+ */
 async function findOrCreateEntity(destSession, collectionUID, name, code) {
   let filterQuery = '';
   if (code) {
@@ -357,6 +391,9 @@ async function findOrCreateEntity(destSession, collectionUID, name, code) {
   return await createEntity(destSession, collectionUID, name, code);
 }
 
+/**
+ * Crea una nueva entidad en `collectionUID` con 'name' y 'code' (si existe).
+ */
 async function createEntity(destSession, collectionUID, name, code) {
   console.log(`Creando nueva entidad en ${collectionUID}: (name=${name}, code=${code || 'N/A'})`);
 
@@ -396,6 +433,10 @@ async function createEntity(destSession, collectionUID, name, code) {
   }
 }
 
+/**
+ * Sincroniza la página entera en admin (excluyendo el procesamiento de imágenes).
+ * Se remueven explícitamente los campos relacionados a imágenes antes de enviar el PUT.
+ */
 async function syncFullPageAdmin(sourceSession, destSession, contentId, item) {
   const collectionUID = item.contentType;
 
@@ -449,15 +490,18 @@ const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${c
     }
   }
 
+  // Limpiar la data sin procesamiento adicional y remover campos de imagen
   let cleanedData = deepCleanData(devData);
   cleanedData = removeImageFields(cleanedData);
 
+  // Actualizar datos básicos
   cleanedData.name = devData.name;
   cleanedData.uri = devData.uri;
   cleanedData.locale = 'en';
   cleanedData.publishedAt = new Date().toISOString();
 
-
+  // Procesar relaciones (site, sliders, features, resorts)
+  // Si tienes más relaciones, agrégalas de forma similar:
   console.log("Procesando relaciones...");
   try {
     if (devData.site && devData.site.data) {
@@ -499,9 +543,12 @@ const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${c
     console.error("Error procesando relación de resorts:", error.message);
   }
 
+  // EJEMPLO ADICIONAL: SEO, PUBLISHER, ETC.
+  // Si en tu DevData hay algo como devData.seo => { data: [...] }
   try {
     if (devData.seo && devData.seo.data && devData.seo.data.length) {
       console.log("Procesando relación de seo...");
+      // Ajusta el UID a tu modelo real, por ejemplo 'api::seo.seo'
       cleanedData.seo = await copyRelationsFor(devData.seo, 'api::seo.seo', destSession);
       console.log("Relación de seo procesada:", cleanedData.seo);
     }
@@ -509,9 +556,11 @@ const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${c
     console.error("Error procesando relación de seo:", error.message);
   }
 
+  // Si en tu DevData hay algo como devData.publisher => { data: [...] }
   try {
     if (devData.publisher && devData.publisher.data && devData.publisher.data.length) {
       console.log("Procesando relación de publisher...");
+      // Ajusta el UID a tu modelo real, por ejemplo 'api::publisher.publisher'
       cleanedData.publisher = await copyRelationsFor(devData.publisher, 'api::publisher.publisher', destSession);
       console.log("Relación de publisher procesada:", cleanedData.publisher);
     }
@@ -519,6 +568,7 @@ const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${c
     console.error("Error procesando relación de publisher:", error.message);
   }
 
+  // Construir payload para actualizar
   const directPayload = cleanedData;
   const wrappedPayload = { data: cleanedData };
 
@@ -583,7 +633,10 @@ const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${c
   }
 }
 
-
+/**
+ * Sincroniza sólo un componente específico (ej. comp_header_0) dentro de la página.
+ * Se remueven los campos de imagen en el componente antes de actualizar.
+ */
 async function syncComponentAdmin(sourceSession, destSession, contentId, component) {
   const collectionUID = component.contentType;
   const getDevUrl = `${sourceSession.baseUrl}/content-manager/collection-types/${collectionUID}/${contentId}?populate=*&plugins[i18n][locale]=en`;
@@ -604,11 +657,13 @@ async function syncComponentAdmin(sourceSession, destSession, contentId, compone
     uri: devData.uri
   });
 
+  // Extraer sólo el componente que se desea
   const compInfo = extractComponent(devData, component.id);
   if (!compInfo) {
     throw new Error(`No se encontró el componente: ${component.id} en la fuente`);
   }
 
+  // Buscar la página en prod
   let existingPage = null;
   if (devData.uri) {
     try {
@@ -638,9 +693,11 @@ async function syncComponentAdmin(sourceSession, destSession, contentId, compone
     }
   }
 
+  // Limpiar el componente y remover campos de imagen
   let cleanedComponent = deepCleanData(compInfo.value);
   cleanedComponent = removeImageFields(cleanedComponent);
 
+  // Reconstruir payload
   let directPayload;
   if (compInfo.fullArray) {
     const updatedArray = [...compInfo.fullArray];
@@ -687,6 +744,10 @@ async function syncComponentAdmin(sourceSession, destSession, contentId, compone
   }
 }
 
+/**
+ * Dado un objeto con data (ej: devData), extrae el componente
+ * según un ID con el formato comp_key o comp_key_index
+ */
 function extractComponent(obj, compId) {
   const splitted = compId.split('_');
   const key = splitted[1];
@@ -702,6 +763,7 @@ function extractComponent(obj, compId) {
   return null;
 }
 
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
   console.log(`Abre http://localhost:${PORT} para usar la interfaz.`);
